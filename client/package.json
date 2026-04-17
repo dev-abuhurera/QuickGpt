@@ -1,23 +1,8 @@
 {
   "name": "client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "keywords": [
-    "QuickGpt"
-  ],
-  "homepage": "https://github.com/dev-abuhurera/QuickGpt#readme",
-  "bugs": {
-    "url": "https://github.com/dev-abuhurera/QuickGpt/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dev-abuhurera/QuickGpt.git"
-  },
-  "license": "ISC",
-  "author": "Dev-abuhurera",
   "type": "module",
-  "main": "eslint.config.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -34,10 +19,13 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.0",
+    "autoprefixer": "^11.2.6",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.2.1",
     "vite": "^8.0.0"
   }
 }
