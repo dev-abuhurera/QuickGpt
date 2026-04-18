@@ -1,13 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
+const connectDB = require("./config/dbConnection");
+const authRoute = require("./routes/authRoute.js")
 
+// Dotenv Configuration
 dotenv.config();
 
+// MongoDB Connection
+connectDB();
+
+// Port
 const port = process.env.PORT || 5000;
+
+// Express App
 const app = express();
 
 // Middleware
@@ -18,12 +24,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Server is running!");
 });
-
-// // MongoDB Connection
-// const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/quickgpt";
-// mongoose.connect(MONGODB_URI)
-//   .then(() => console.log("Connected to MongoDB established successfully"))
-//   .catch(err => console.error("MongoDB connection error:", err));
+app.use('/api/auth', authRoute);
 
 //Server Starting
 app.listen(port, () => {
