@@ -20,13 +20,12 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 20,
     }, 
-}, {timespan: true})
+}, {timestamps: true})
 
 // Password Hashing
-userSchema.pre('save', async function(next){
-    if(!this.isModified('password')) return next();
-    else this.password = await bcrypt.hash(this.password, saltRounds);
-    next();
+userSchema.pre('save', async function(){
+    if(!this.isModified('password')) return;
+    else this.password = await bcrypt.hash(this.password, saltRounds)
 })
 
 //Password Comparison
