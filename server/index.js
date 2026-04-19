@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/dbConnection");
 const authRoute = require("./routes/authRoute.js");
+const protect = require("./middleware/protect.js");
 
 // Dotenv Configuration
 dotenv.config();
@@ -26,6 +27,11 @@ app.get("/", (req, res) => {
 });
 app.use('/api/auth', authRoute);
 app.use('/api/login', authRoute);
+
+// Test Route 
+app.get('/api/test', protect, (req, res) => {
+    res.send('Test route');
+})
 
 //Server Starting
 app.listen(port, () => {
