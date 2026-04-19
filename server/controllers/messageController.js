@@ -3,14 +3,15 @@ const Chat = require('../models/Chat');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const User = require('../models/User');
 
-console.log('Gemini Key:', process.env.GEMINI_API_KEY)
+console.log('Gemini Key:', process.env.GEMINI_API_KEY ? 'Present' : 'Missing')
 
 const addMessage = async (req, res) => {
 
   try {
    
-    const { role, content } = req.body;
+    const { content } = req.body;
     const { chatId } = req.params;
 
     const chat = await Chat.findById(chatId);
@@ -21,12 +22,27 @@ const addMessage = async (req, res) => {
         chatId, 
         role: 'user', 
         content,
-        credit: 0 
+        creditsUsed: 0
 
     });
 
-    const result = await model.generateContent(content);
-    const aiText = result.response.text();
+    let aiText = "";
+    try {
+        
+      const result = await model.generateContent(content);
+      aiText = result.response.text();
+
+    } catch (aiError) {
+
+      console.error('Gemini AI Error:', aiError);
+
+      return res.status(500).json({ 
+        message: 'AI generation failed', 
+        error: aiError.message,
+        userMessage: message 
+      });
+      
+    }
 
     const aiMessage = await Message.create({
 
@@ -37,13 +53,23 @@ const addMessage = async (req, res) => {
 
     })
 
-    res.status(201).json({message, aiMessage});
+    await User.findByIdAndUpdate(req.user._id, { 
+        $inc: { credits: -1 } 
+    })
+
+    
+    // Update chat title if it's still the default
+    if (chat.title === "New Chat") {
+        await Chat.findByIdAndUpdate(chatId, { title: content.substring(0, 30) + (content.length > 30 ? '...' : '') });
+    }
+
+    res.status(201).json({message, aiMessage, chatTitle: content.substring(0, 30)});
 
   } 
 
   catch (error) {
 
-    console.log(error);
+    console.log('Server Error:', error);
     res.status(500).json({ message: error.message });
     return;
 

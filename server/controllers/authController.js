@@ -6,11 +6,8 @@ const generateToken = (id) => {
 }
 
 const registerUser = async(req, res) => {
-
     try{
-
         const {name, email, password} = req.body;
-
         if(!name || !email || !password){
             res.status(400).json({message: 'All fields are required'});
             return;
@@ -30,31 +27,29 @@ const registerUser = async(req, res) => {
         await newUser.save();
         res.status(201).json({message: 'User registered successfully', 
             token: generateToken(newUser._id),
-            _id: newUser._id,
-            name: newUser.name,
-            email: newUser.email,
-            credits: newUser.credits,
+            user: {
+                _id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+                credits: newUser.credits,
+            }
         })
     
     }catch(error){
         console.log(error);
         res.status(500).json({message: 'Internal server error'});
     }
-
 };
-
 
 const login = async(req, res) => {
     try{
         const {email, password} = req.body;
-
         if(!email || !password){
             res.status(400).json({message: 'All fields are required'});
             return;
         }
 
         const user = await User.findOne({email: email});
-
         if(!user){
             res.status(401).json({message: 'User not found'});
             return;
@@ -69,15 +64,37 @@ const login = async(req, res) => {
         res.status(200).json({
             message: "Login successful",
             token: generateToken(user._id),
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            credits: user.credits,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                credits: user.credits,
+            }
         })
     }catch(error){
         console.log(error);
         res.status(500).json({message: 'Internal server error'});
     }
 }
+
+const getUserData = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                credits: user.credits
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
  
-module.exports = { registerUser, login };
+module.exports = { registerUser, login, getUserData };
