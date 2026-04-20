@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import Chatbox from './components/Chatbox'
 import Credits from './pages/Credits'
+import VisualStudio from './pages/VisualStudio'
 import Community from './pages/Community'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -12,31 +13,32 @@ const App = () => {
   const { user, notifications = [] } = useAppContext();
 
   return (
-    <div className='h-screen w-screen overflow-hidden bg-[var(--bg)] text-[var(--text)] transition-colors duration-300'>
+    <div className='h-screen w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black'>
       {/* Notifications Layer */}
-      <div className='fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none'>
+      <div className='fixed top-8 right-8 z-100 flex flex-col gap-4 pointer-events-none'>
         {notifications.map(n => (
-          <div key={n.id} className='pointer-events-auto formal-card px-6 py-4 shadow-xl animate-fade-in text-sm font-medium min-w-[300px] border-l-4 border-[var(--accent)]'>
+          <div key={n.id} className='pointer-events-auto bg-[#111] border border-white/5 px-6 py-4 shadow-2xl animate-fade-in text-[10px] font-bold uppercase tracking-widest text-white min-w-[280px]'>
             {n.message}
           </div>
         ))}
       </div>
 
-      <div className='h-full w-full relative z-10'>
+      <div className='h-full w-full relative'>
         {user ? (
-          <div className='flex h-full w-full overflow-hidden p-0 gap-0'>
+          <div className='flex h-full w-full overflow-hidden'>
             <Sidebar />
-            <div className='flex-1 overflow-hidden bg-[var(--bg)] relative flex flex-col h-full'>
+            <main className='flex-1 overflow-hidden relative flex flex-col h-full bg-[#050505]'>
               <Routes>
-                <Route path='/' element={<div className="flex-1 flex flex-col min-h-0"><Chatbox /></div>} />
-                <Route path='/credits' element={<div className="flex-1 flex flex-col min-h-0"><Credits /></div>} />
-                <Route path='/community' element={<div className="flex-1 flex flex-col min-h-0"><Community /></div>} />
+                <Route path='/' element={<Chatbox />} />
+                <Route path='/visual-studio' element={<VisualStudio />} />
+                <Route path='/credits' element={<Credits />} />
+                <Route path='/community' element={<Community />} />
                 <Route path='*' element={<Navigate to="/" />} />
               </Routes>
-            </div>
+            </main>
           </div>
         ) : (
-          <div className='flex items-center justify-center min-h-screen'>
+          <div className='h-full w-full'>
             <Routes>
               <Route path='/login' element={<Login />} />
               <Route path='/signup' element={<Signup />} />

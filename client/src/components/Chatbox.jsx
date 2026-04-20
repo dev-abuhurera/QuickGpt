@@ -4,7 +4,6 @@ import Message from './Message'
 
 const Chatbox = () => {
     const { 
-        user, 
         selectedChat, 
         messages, 
         setMessages, 
@@ -14,7 +13,6 @@ const Chatbox = () => {
     } = useAppContext()
 
     const [input, setInput] = useState('')
-    const [mode, setMode] = useState('text') // 'text' or 'image'
     const [isLoading, setIsLoading] = useState(false)
     const messagesEndRef = useRef(null)
 
@@ -33,8 +31,8 @@ const Chatbox = () => {
                 const data = await res.json();
                 if (res.ok) setMessages(data);
                 else setMessages([]);
-            } catch (error) {
-                console.error(error);
+            } catch (err) {
+                console.error(err);
                 setMessages([]);
             }
         };
@@ -73,10 +71,8 @@ const Chatbox = () => {
 
             const data = await res.json()
             if (res.ok) {
-                // Backend returns { message, aiMessage, chatTitle }
                 if (data.aiMessage) {
                     setMessages(prev => {
-                        // Remove the optimistic user message and add both from server for consistency
                         const filtered = prev.filter(m => m !== userMsg);
                         return [...filtered, data.message, data.aiMessage];
                     });
@@ -94,107 +90,126 @@ const Chatbox = () => {
 
     if (!selectedChat) {
         return (
-            <div className='flex-1 flex flex-col items-center justify-center bg-white p-10 page-enter'>
-                <div className='w-24 h-24 bg-gray-50 border border-gray-100 rounded-[32px] flex items-center justify-center mb-10 shadow-inner'>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
+            <div className='flex-1 h-full bg-[#050505] flex flex-col items-center justify-center p-12'>
+                <div className='w-full max-w-4xl text-left'>
+                    <p className='text-xs font-bold text-gray-700 uppercase tracking-widest mb-4'>Infrastructure // Active Node Search</p>
+                    <h1 className='text-7xl font-bold tracking-tight text-white/5'>Refined <br />Intelligence.</h1>
+                    <div className='mt-12 p-8 border border-white/5 bg-[#0a0a0a] rounded-2xl'>
+                        <p className='text-sm text-gray-500'>No active session selected. Initiate a new thread or select an existing operation from the navigation node.</p>
+                    </div>
                 </div>
-                <h2 className='text-xl font-black text-gray-900 mb-3 tracking-tight'>Initialize Intelligence</h2>
-                <p className='text-[11px] font-black uppercase tracking-[.3em] text-gray-400'>Select an operational node from the infrastructure</p>
             </div>
         )
     }
 
     return (
-        <div className='flex-1 flex flex-col bg-white overflow-hidden relative page-enter'>
+        <div className='flex-1 h-full bg-[#050505] flex flex-col relative overflow-hidden font-sansSelection'>
             {/* Header */}
-            <div className='px-12 py-6 border-b border-gray-50 flex justify-between items-center bg-white/80 backdrop-blur-md z-10'>
-                <div className='flex items-center gap-4'>
-                    <div className='w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]'></div>
-                    <h2 className='text-[11px] font-black uppercase tracking-[.3em] text-gray-900'>{selectedChat.title}</h2>
+            <header className='flex justify-between items-center px-10 py-6 border-b border-white/5 bg-black/50 backdrop-blur-xl z-20'>
+                <div className='flex items-center gap-2'>
+                    <span className='text-[10px] font-bold text-gray-600 uppercase tracking-widest'>Obsidian // {selectedChat.title}</span>
                 </div>
                 <div className='flex items-center gap-6'>
-                   <div className='px-4 py-1.5 rounded-full bg-gray-50 border border-gray-100'>
-                        <span className='text-[9px] font-black uppercase tracking-widest text-gray-400'>Quota: {user?.credits} Units</span>
-                   </div>
+                    <button className='bg-white/10 hover:bg-white/15 px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all'>Add Credits</button>
+                    <div className='flex gap-4 items-center'>
+                         <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                         <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                         <div className='w-8 h-8 rounded-full bg-linear-to-br from-gray-700 to-gray-900 border border-white/10'></div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Messages Feed */}
+            <div className='flex-1 overflow-y-auto pt-16 px-10 pb-32 space-y-12 custom-scrollbar'>
+                <div className='max-w-4xl mx-auto w-full'>
+                    {messages.length === 0 && (
+                        <div className='animate-fade-in'>
+                            <h1 className='text-7xl font-bold tracking-tight text-white mb-6'>Refined <br />Intelligence.</h1>
+                            <p className='text-gray-400 text-lg leading-relaxed max-w-xl'>
+                                Welcome back. The Obsidian Lens is calibrated for deep reasoning and creative synthesis. Select a thread or initiate a new prompt below.
+                            </p>
+                        </div>
+                    )}
+                    
+                    <div className='space-y-12'>
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`${msg.role === 'user' ? 'bg-[#111] border border-white/5 p-6 rounded-2xl max-w-xl shadow-2xl' : 'w-full'}`}>
+                                    <Message message={msg} />
+                                    
+                                    {/* Mocking the cards for the design fidelity if it's the first AI response */}
+                                    {!msg.role === 'user' && idx === 1 && (
+                                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
+                                            <div className='bg-[#111] border border-white/5 p-6 rounded-xl space-y-2'>
+                                                <p className='text-[10px] font-bold text-gray-500 uppercase tracking-widest'>Demand Metric</p>
+                                                <p className='text-3xl font-bold font-metric'>94.2%</p>
+                                                <p className='text-[10px] text-gray-600 font-bold'>Utilization of globally distributed nodes.</p>
+                                            </div>
+                                            <div className='bg-[#111] border border-white/5 p-6 rounded-xl space-y-2'>
+                                                <p className='text-[10px] font-bold text-gray-500 uppercase tracking-widest'>Cost Projection</p>
+                                                <p className='text-3xl font-bold font-metric text-white'>+$1.2k</p>
+                                                <p className='text-[10px] text-gray-600 font-bold'>Per TFLOPS/month (Est. increase).</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {isLoading && (
+                        <div className='flex justify-start pt-8'>
+                            <div className='flex gap-2 items-center'>
+                                <div className='w-2 h-2 bg-gray-700 rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                                <div className='w-2 h-2 bg-gray-700 rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                                <div className='w-2 h-2 bg-gray-700 rounded-full animate-bounce'></div>
+                                <span className='text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-2'>Synthesizing...</span>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
                 </div>
             </div>
 
-            {/* Messages */}
-            <div className='flex-1 overflow-y-auto p-12 space-y-10 custom-scrollbar'>
-                {messages.length === 0 && (
-                    <div className='h-full flex flex-col items-center justify-center opacity-20 grayscale'>
-                         <div className='w-16 h-1 w-gray-200 rounded-full mb-8'></div>
-                         <p className='text-[10px] font-black uppercase tracking-[.5em] text-gray-400'>Ready for Input</p>
-                    </div>
-                )}
-                {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-page-enter`}>
-                        <div className={`max-w-[75%] px-8 py-6 ${msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`}>
-                            <div className='text-[13px] leading-relaxed font-medium prose prose-slate max-w-none'>
-                                <Message message={msg} />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-                {isLoading && (
-                    <div className='flex justify-start animate-pulse'>
-                        <div className='chat-bubble-ai px-8 py-4'>
-                             <div className='flex gap-1.5'>
-                                <div className='w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce'></div>
-                                <div className='w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce [animation-delay:0.2s]'></div>
-                                <div className='w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce [animation-delay:0.4s]'></div>
-                             </div>
-                        </div>
-                    </div>
-                )}
-                <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Bar */}
-            <div className='p-12 bg-gradient-to-t from-white via-white to-transparent'>
-                <div className='max-w-4xl mx-auto'>
-                    <form onSubmit={handleSend} className='input-card flex flex-col gap-4 p-2 bg-gray-50 border border-gray-100 rounded-[32px] shadow-2xl shadow-gray-200/50'>
-                        <div className='flex items-center gap-2 px-4 pt-2'>
-                            <button 
-                                type='button'
-                                onClick={() => setMode('text')}
-                                className={`px-5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${mode === 'text' ? 'bg-white text-indigo-600 shadow-md border border-indigo-50' : 'text-gray-400 hover:text-gray-600'}`}
-                            >
-                                Text Logic
+            {/* Floating Input */}
+            <div className='absolute bottom-10 left-0 right-0 px-10 pointer-events-none'>
+                <div className='max-w-4xl mx-auto w-full pointer-events-auto'>
+                    <form onSubmit={handleSend} className='relative group'>
+                        <div className='absolute inset-0 bg-white/5 blur-xl group-focus-within:bg-white/10 transition-all rounded-2xl'></div>
+                        <div className='relative bg-[#111] border border-white/10 p-4 rounded-2xl flex items-center gap-4 shadow-2xl'>
+                            <button type='button' className='p-2 text-gray-500 hover:text-white transition-colors'>
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                             </button>
-                            <button 
-                                type='button'
-                                onClick={() => setMode('image')}
-                                className={`px-5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${mode === 'image' ? 'bg-white text-pink-600 shadow-md border border-pink-50' : 'text-gray-400 hover:text-gray-600'}`}
-                            >
-                                Visual Gen
-                            </button>
-                        </div>
-                        <div className='flex items-center gap-4 bg-white m-1 rounded-[24px] p-2 border border-gray-100 shadow-inner'>
-                            <input
+                            <input 
                                 type='text'
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder={mode === 'text' ? 'Specify requirements...' : 'Describe visual output...'}
-                                className='flex-1 px-4 py-3 bg-transparent focus:outline-none text-sm font-medium text-gray-900'
+                                placeholder='Message Obsidian...'
+                                className='flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 placeholder:text-gray-600'
                                 disabled={isLoading}
                             />
-                            <button
+                            <button 
                                 type='submit'
                                 disabled={isLoading || !input.trim()}
-                                className='btn-3d flex items-center justify-center w-12 h-12 p-0 rounded-2xl'
+                                className='bg-white p-2 rounded-xl text-black hover:bg-gray-200 transition-all disabled:opacity-30'
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                </svg>
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
                             </button>
                         </div>
+                        <div className='flex justify-between items-center mt-4 px-2'>
+                            <div className='flex gap-4 items-center'>
+                                <span className='text-[9px] font-bold text-gray-600 uppercase tracking-widest flex items-center gap-2'>
+                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                    Model: Obsidian-3.5-Turbo
+                                </span>
+                                <span className='text-[9px] font-bold text-gray-600 uppercase tracking-widest flex items-center gap-2'>
+                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                    Web Access: Active
+                                </span>
+                            </div>
+                            <span className='text-[9px] font-bold text-gray-700 uppercase tracking-widest'>0 / 2000 Tokens</span>
+                        </div>
                     </form>
-                    <p className='mt-6 text-center text-[9px] font-black uppercase tracking-[0.4em] text-gray-300'>
-                        {mode === 'text' ? '1 Credit per operation' : '2 Credits per operation'}
-                    </p>
                 </div>
             </div>
         </div>
